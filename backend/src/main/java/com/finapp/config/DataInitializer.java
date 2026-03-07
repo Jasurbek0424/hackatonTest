@@ -1,11 +1,15 @@
 package com.finapp.config;
 
 import com.finapp.entity.Account;
+import com.finapp.entity.Role;
 import com.finapp.entity.Transaction;
+import com.finapp.entity.User;
 import com.finapp.repository.AccountRepository;
 import com.finapp.repository.TransactionRepository;
+import com.finapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,16 +21,27 @@ public class DataInitializer implements CommandLineRunner {
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         if (accountRepository.count() > 0) return;
+
+        User demoUser = userRepository.save(User.builder()
+                .email("demo@finpilot.uz")
+                .password(passwordEncoder.encode("demo123"))
+                .firstName("Demo")
+                .lastName("User")
+                .role(Role.USER)
+                .build());
 
         Account uzcard = accountRepository.save(Account.builder()
                 .name("Uzcard")
                 .type("CARD")
                 .currency("UZS")
                 .balance(new BigDecimal("5000000"))
+                .user(demoUser)
                 .build());
 
         Account humo = accountRepository.save(Account.builder()
@@ -34,6 +49,7 @@ public class DataInitializer implements CommandLineRunner {
                 .type("CARD")
                 .currency("UZS")
                 .balance(new BigDecimal("3000000"))
+                .user(demoUser)
                 .build());
 
         Account cash = accountRepository.save(Account.builder()
@@ -41,16 +57,17 @@ public class DataInitializer implements CommandLineRunner {
                 .type("CASH")
                 .currency("UZS")
                 .balance(new BigDecimal("1500000"))
+                .user(demoUser)
                 .build());
 
-        Account usd = accountRepository.save(Account.builder()
+        accountRepository.save(Account.builder()
                 .name("USD Cash")
                 .type("CASH")
                 .currency("USD")
                 .balance(new BigDecimal("500"))
+                .user(demoUser)
                 .build());
 
-        // Demo transactions
         LocalDate today = LocalDate.now();
         createTx("Tushlik - plov", "EXPENSE", "Food", new BigDecimal("45000"), today, uzcard);
         createTx("Taxi - uyga", "EXPENSE", "Transport", new BigDecimal("25000"), today, uzcard);

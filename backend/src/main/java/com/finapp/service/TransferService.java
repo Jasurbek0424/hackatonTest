@@ -3,6 +3,7 @@ package com.finapp.service;
 import com.finapp.dto.TransferDTO;
 import com.finapp.entity.Account;
 import com.finapp.entity.Transfer;
+import com.finapp.entity.User;
 import com.finapp.repository.AccountRepository;
 import com.finapp.repository.TransferRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +19,19 @@ public class TransferService {
 
     private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
+    private final UserService userService;
 
     public List<TransferDTO> getAll() {
-        return transferRepository.findAllByOrderByDateDesc().stream().map(this::toDTO).toList();
+        User user = userService.getCurrentUser();
+        return transferRepository.findAllByUserIdOrderByDateDesc(user.getId()).stream().map(this::toDTO).toList();
     }
 
     @Transactional
     public TransferDTO create(TransferDTO dto) {
-        Account from = accountRepository.findById(dto.getFromAccountId())
+        User user = userService.getCurrentUser();
+        Account from = accountRepository.findByIdAndUserId(dto.getFromAccountId(), user.getId())
                 .orElseThrow(() -> new RuntimeException("From account not found"));
-        Account to = accountRepository.findById(dto.getToAccountId())
+        Account to = accountRepository.findByIdAndUserId(dto.getToAccountId(), user.getId())
                 .orElseThrow(() -> new RuntimeException("To account not found"));
 
         from.setBalance(from.getBalance().subtract(dto.getAmount()));
