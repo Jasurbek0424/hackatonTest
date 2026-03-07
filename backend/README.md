@@ -10,15 +10,17 @@
 
 ## Конфигурация
 
-Параметры задаются в `src/main/resources/application.yml`:
+Параметры задаются через переменные окружения или в `src/main/resources/application.yml` (значения по умолчанию — для локальной разработки):
 
-| Параметр | Описание | По умолчанию |
-|----------|----------|--------------|
-| `server.port` | Порт приложения | 8080 |
-| `spring.datasource.url` | URL БД PostgreSQL | `jdbc:postgresql://localhost:5432/finpilot` |
-| `spring.datasource.username` | Пользователь БД | postgres |
-| `spring.datasource.password` | Пароль БД | postgres |
+| Переменная / свойство | Описание | По умолчанию |
+|-----------------------|----------|--------------|
+| `SERVER_PORT` | Порт приложения | 8080 |
+| `SPRING_DATASOURCE_URL` | URL БД PostgreSQL | `jdbc:postgresql://localhost:5432/finpilot` |
+| `SPRING_DATASOURCE_USERNAME` | Пользователь БД | postgres |
+| `SPRING_DATASOURCE_PASSWORD` | Пароль БД | postgres |
+| `CORS_ALLOWED_ORIGINS` | Разрешённые origins (через запятую) | http://localhost:3000 |
 | `ANTHROPIC_API_KEY` | API-ключ Anthropic (для AI) | — |
+| `SWAGGER_UI_ENABLED` | Включить Swagger UI | true |
 
 Для работы AI-функций (категоризация, советы) нужна переменная окружения:
 
@@ -105,3 +107,7 @@ mvn spring-boot:run
 
 - **Swagger UI:** http://localhost:8080/swagger-ui.html  
 - **OpenAPI JSON:** http://localhost:8080/v3/api-docs
+
+## Деплой на сторонние хосты
+
+Список требований и варианты развёртывания (Docker, JAR на VPS, PaaS) описаны в **[DEPLOY.md](DEPLOY.md)**.
