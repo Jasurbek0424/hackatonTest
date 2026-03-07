@@ -26,14 +26,39 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                    @Param("from") LocalDate from,
                                    @Param("to") LocalDate to);
 
+    @Query("SELECT t FROM Transaction t WHERE " +
+           "t.account.user.id = :userId AND " +
+           "(:type IS NULL OR t.type = :type) AND " +
+           "(:category IS NULL OR t.category = :category) AND " +
+           "(:from IS NULL OR t.date >= :from) AND " +
+           "(:to IS NULL OR t.date <= :to) " +
+           "ORDER BY t.date DESC")
+    List<Transaction> findFilteredByUser(@Param("userId") Long userId,
+                                         @Param("type") String type,
+                                         @Param("category") String category,
+                                         @Param("from") LocalDate from,
+                                         @Param("to") LocalDate to);
+
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.type = :type")
     BigDecimal sumByType(@Param("type") String type);
 
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.account.user.id = :userId AND t.type = :type")
+    BigDecimal sumByTypeAndUser(@Param("type") String type, @Param("userId") Long userId);
+
     @Query("SELECT t.category, SUM(t.amount) FROM Transaction t WHERE t.type = :type GROUP BY t.category")
     List<Object[]> sumByCategoryAndType(@Param("type") String type);
+
+    @Query("SELECT t.category, SUM(t.amount) FROM Transaction t WHERE t.account.user.id = :userId AND t.type = :type GROUP BY t.category")
+    List<Object[]> sumByCategoryAndTypeByUser(@Param("type") String type, @Param("userId") Long userId);
 
     @Query("SELECT FUNCTION('TO_CHAR', t.date, 'YYYY-MM') as month, t.type, SUM(t.amount) " +
            "FROM Transaction t GROUP BY FUNCTION('TO_CHAR', t.date, 'YYYY-MM'), t.type " +
            "ORDER BY month")
     List<Object[]> monthlyStats();
+
+    @Query("SELECT FUNCTION('TO_CHAR', t.date, 'YYYY-MM') as month, t.type, SUM(t.amount) " +
+           "FROM Transaction t WHERE t.account.user.id = :userId " +
+           "GROUP BY FUNCTION('TO_CHAR', t.date, 'YYYY-MM'), t.type " +
+           "ORDER BY month")
+    List<Object[]> monthlyStatsByUser(@Param("userId") Long userId);
 }

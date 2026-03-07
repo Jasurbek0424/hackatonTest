@@ -1,5 +1,6 @@
 package com.finapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,4 +26,9 @@ public class Account {
 
     @Column(nullable = false)
     private BigDecimal balance;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 }
