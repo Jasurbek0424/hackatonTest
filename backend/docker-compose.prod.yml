@@ -1,0 +1,15 @@
+# Деплой только приложения (PostgreSQL — внешняя, задаётся через env)
+# Запуск: docker compose -f docker-compose.prod.yml --env-file .env up -d
+
+services:
+  app:
+    build: .
+    container_name: finpilot-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    restart: unless-stopped
