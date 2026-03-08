@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+docker-compose.yml
+node_modules/
+.next
+.bun
+.git
+.gitignore
+.idea/
+.vscode/
+*.swp
+*.swo
+*.log
